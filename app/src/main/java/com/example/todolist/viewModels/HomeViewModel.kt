@@ -31,14 +31,26 @@ class HomeViewModel: ViewModel() {
     var taskTitle by  mutableStateOf("")
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
+   var state by mutableStateOf(TaskModel())
+       private set
+
 
     private val _tasksData = MutableStateFlow<List<TaskModel>>(emptyList())
     val tasksData: StateFlow<List<TaskModel>> = _tasksData
+
 
     fun onTaskTitleChange(newTaskTitle: String) {
         taskTitle = newTaskTitle
     }
 
+    fun onValue(value: String, text: String){
+        when(text){
+            "title" -> state = state.copy(title = value)
+        }
+    }
 
     fun fetchTask() {
         val email = auth.currentUser?.email
@@ -63,30 +75,79 @@ class HomeViewModel: ViewModel() {
             }
     }
 
+    fun getTaskById(documentId: String) {
+        firestore.collection("tasks")
+            .document(documentId)
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot != null) {
+                    val task = snapshot.toObject(TaskModel::class.java)
+                    state = state.copy(
+                        title = task?.title ?: ""
+                    )
+                }
+            }
+    }
+
     fun saveNewTask(onSuccess:() -> Unit) {
             val email = auth.currentUser?.email
         viewModelScope.launch(Dispatchers.IO) {
             try {
-//                val newTask = hashMapOf(
-//                    "title" to taskMessage,
-//                    "date" to formatDate(),
-//                    "userEmail" to email.toString()
-//                )
-                val newTask = TaskModel(
-                    userEmail = email.toString(),
-                    title = taskTitle,
-                    date = formatDate()
+                isLoading = true
+                val newTask = hashMapOf(
+                    "title" to taskTitle,
+                    "date" to formatDate(),
+                    "userEmail" to email.toString()
                 )
+//                val newTask = TaskModel(
+//                    userEmail = email.toString(),
+//                    title = taskTitle,
+//                    date = formatDate()
+//                )
 
                 firestore.collection("tasks").add(newTask)
-                    .addOnSuccessListener { documentRef ->
-                        val docId = documentRef.id
-
-                        firestore.collection("tasks").document(docId).update("idDoc", docId)
+                    .addOnSuccessListener {
+                        isLoading = false
+//                        val docId = documentRef.id
+//
+//                        firestore.collection("tasks").document(docId).update("idDoc", docId)
                         onSuccess()
                     }
             } catch(e: Exception) {
+                isLoading = false
                 Log.d("Erro save", "Erro ao guardar ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun updateTask(idDoc: String, onSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                isLoading = true
+                val editTask = hashMapOf("title" to state.title)
+
+                firestore.collection("tasks").document(idDoc)
+                    .update(editTask as Map<String, Any>)
+                    .addOnSuccessListener {
+                        isLoading = false
+                        onSuccess()
+                    }
+            } catch (e: Exception) {
+                isLoading = false
+                Log.d("Error Edit", "Erro ao Editar dados da tarefa ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun deleteTask(idDoc: String, onSuccess: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                firestore.collection("tasks").document(idDoc)
+                    .delete()
+                    .addOnSuccessListener {
+                        onSuccess()
+                    }
+            } catch (e: Exception) {
+                Log.d("Error Delete", "Erro ao Eliminar tarefa ${e.localizedMessage}")
             }
         }
     }

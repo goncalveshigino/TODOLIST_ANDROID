@@ -28,10 +28,12 @@ fun CardTask(
     date: String,
     onClick:() -> Unit
 ) {
+    var showAlert by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp, top = 20.dp)
+            .clickable { showAlert = true }
     ) {
         Row {
             Column {
@@ -41,8 +43,10 @@ fun CardTask(
 
             Spacer(Modifier.weight(1f))
 
-            IconButton(onClick = { onClick}) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "")
+            Row {
+                IconButton(onClick = { onClick() }) {
+                    Icon(imageVector = Icons.Default.Edit, contentDescription = "")
+                }
             }
         }
 

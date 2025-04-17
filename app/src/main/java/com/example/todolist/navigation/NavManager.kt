@@ -29,8 +29,8 @@ fun NavManager(loginVM: LoginViewModel, homeVM: HomeViewModel){
         composable("Home"){
             HomeView(navController, homeVM)
         }
-        composable("EditTaskView/{idDod}", arguments = listOf(
-            navArgument("idDoc") { type = NavType.StringType}
+        composable("EditTaskView/{idDoc}", arguments = listOf(
+            navArgument("idDoc") { type = NavType.StringType }
         )){
             val idDoc = it.arguments?.getString("idDoc")?: ""
 

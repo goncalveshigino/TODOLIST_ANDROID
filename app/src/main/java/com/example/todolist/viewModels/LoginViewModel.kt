@@ -24,6 +24,9 @@ class LoginViewModel: ViewModel() {
     var userName by mutableStateOf("")
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
 
     fun onEmailChange(newEmail: String) {
         email = newEmail
@@ -40,8 +43,13 @@ class LoginViewModel: ViewModel() {
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                authService.login(email, password, onSuccess)
+                isLoading = true
+                authService.login(email, password){
+                    isLoading = false
+                    onSuccess()
+                }
             } catch(e: Exception) {
+                isLoading = false
                 Log.d("ERRO no jetpack", "Error: ${e.localizedMessage}")
            }
         }
@@ -50,8 +58,13 @@ class LoginViewModel: ViewModel() {
     fun createUser(onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
-                authService.registerUser(email,password,userName, onSuccess)
+                isLoading = true
+                authService.registerUser(email,password,userName){
+                    isLoading = false
+                    onSuccess()
+                }
             } catch(e: Exception) {
+                isLoading = false
                 Log.d("ERRO no jetpack", "Error: ${e.localizedMessage}")
             }
         }
