@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1009835779339",
+    "project_id": "swiftuitodo-1b26d",
+    "storage_bucket": "swiftuitodo-1b26d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009835779339:android:a82f6d1aafa8d95aa26e0e",
+        "android_client_info": {
+          "package_name": "com.example.todolist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD63cQVe9tW334S30DVXVn2nlgLl4TdLRI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
